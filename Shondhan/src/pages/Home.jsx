@@ -46,7 +46,7 @@ const Home = () => {
 
           <button 
             className="text-center p-6 bg-white rounded-lg shadow-lg hover:shadow-2xl transition transform hover:scale-105"
-            onClick={() => navigate('/help')}
+            onClick={() => navigate('/emergency-contacts')}
           >
             <div className="flex justify-center mb-4">
               <Phone size={60} className="text-[#311B08]" />
