@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const router = express.Router()
 const Report = require('../model/ReportModel')
 const User = require('../Model/UserModel')
+const Comment = require('../Model/CommentModel')
 // const cloudinary = require('../utils/cloudinary')
 // const upload = require('../middleware/multer')
 
@@ -13,7 +14,7 @@ router.get('/reports/all',async (req, res) => {
     try {
         const reports = await Report.find()
             .select('reportTitle reportDescription reportPic reportVideo reportDivision reportDistrict authorId likeCount dislikeCount crimeTime reportVarified')
-            .populate('authorId', 'name')
+            .populate('authorId', 'userName')
 
         
             return res.status(201).json({
@@ -28,281 +29,297 @@ router.get('/reports/all',async (req, res) => {
     }
 });
 
-router.get('/blogs/myblogs', async (req, res) => {
+router.get('/reports/myreports', async (req, res) => {
     try {
-        const { page = 1, limit = 5, userId } = req.query; // Accept userId from the query params
+        
 
-        // Fetch total count of blogs for the specific user
-        const totalBlogs = await Blogs.countDocuments({ authorId: userId });
+        const {userId}= req.query
+       
+        const reports = await Report.find({ authorId: userId })
+            .select('reportTitle reportDescription reportPic reportVideo reportDivision reportDistrict authorId likeCount dislikeCount crimeTime reportVarified')
+            .populate('authorId', 'name')
+           
 
-        // Fetch paginated blogs for the specific user
-        const blogs = await Blogs.find({ authorId: userId })
-            .select('blogName blogBody blogPicture authorName likeCount dislikeCount')
-            .skip((page - 1) * limit)
-            .limit(Number(limit));
 
-        if (blogs.length > 0) {
-            return res.status(200).json({
+            return res.status(201).json({
                 success: true,
-                blogs,
-                totalBlogs // Include total blog count
+                reports :reports,
+                userId: userId,
+                message:"hello"
+                
             });
-        }
-        return res.status(404).json({ success: false, error: "No more blogs available" });
+      
     } catch (error) {
-        return res.status(500).json({ success: false, error: error.message });
+        return res.status(400).json({ success: false, message: error.message });
     }
 });
 
 
-router.get('/blogs/:id', async (req, res) => {
+router.get('/reports/:id', async (req, res) => {
     try {
         const { userId } = req.query;
 
-        const blog = await Blogs.findById(req.params.id)
-        if (!blog) {
-            return res.json({ success: false, error: "No blogs found" })
+        const report = await Report.findById(req.params.id)
+        if (!report) {
+            return res.status(400).json({ success: false, message: "No blogs found" })
         }
         const userObjectId = new mongoose.Types.ObjectId(userId);
-        const isLiked = blog.likers.some(likerId => likerId.equals(userObjectId));
-        const isDisliked = blog.dislikers.some(dislikerId => dislikerId.equals(userObjectId));
+        const isLiked = report.likers.some(likerId => likerId.equals(userObjectId));
+        const isDisliked = report.dislikers.some(dislikerId => dislikerId.equals(userObjectId));
 
-        return res.json({
-            success: true, blog: blog, isLiked: isLiked,
-            isDisliked: isDisliked
+        return res.status(201).json({
+            success: true, report, isLiked,
+            isDisliked
         })
     } catch (error) {
         console.log(error)
-        return res.json({ success: false, error: error })
+        return res.status(400).json({ success: false, message: error.message })
     }
 })
 
-// router.post('/blogs/create', upload.single('image'), async (req, res) => {
-//     const { blogName, authorId, blogBody } = req.body
+router.post('/reports/create', async (req, res) => {
+    const {
+        reportTitle,reportPic ,reportVideo ,reportDescription,reportDivision,
+        reportDistrict,authorId ,crimeTime} = req.body
 
 
-//     try {
-//         const author = await User.findById(authorId)
-//         if (!author) {
-//             return res.json({ success: false, error: "No user found" })
-//         }
-//         let blogPicture = null;
-//         if (req.file) {
-//             const result = await cloudinary.uploader.upload(req.file.path);
-//             blogPicture = result.secure_url;
-//         }
-//         await new Blogs({
-//             blogName,
-//             blogPicture, // This will be null if no image is uploaded
-//             blogBody,
-//             authorId,
-//             authorName: author.name,
-//         }).save();
-//         return res.status(200).json({ success: true, message: "Blog created successfully" })
+    try {
+        const author = await User.findById(authorId)
+        if (!author) {
+            return res.status(400).json({ success: false, message: "No user found" })
+        }
+        
+        const newReport = new Report({
+            reportTitle,reportPic ,reportVideo ,reportDescription,reportDivision,
+        reportDistrict,authorId ,crimeTime
+        })
+        
+        await newReport.save();
+
+        return res.status(201).json({ success: true, message: "Report created successfully" })
 
 
-//     } catch (error) {
-//         return res.json({ success: false, error: error })
-//     }
+    } catch (error) {
+        return res.status(400).json({ success: false, message: error.message })
+    }
 
-// })
+})
 
-// router.put('/blogs/update', upload.single('image'), async (req, res) => {
-//     const { blogId, blogName, blogBody } = req.body;
-//     let blogPicture;
+router.put('/reports/update',async (req, res) => {
+    const {
+        reportId, reportTitle,reportPic ,reportVideo ,reportDescription,reportDivision,
+        reportDistrict,authorId ,crimeTime} = req.body
 
-//     try {
-//         // If an image is provided, upload to Cloudinary
-//         if (req.file) {
-//             const result = await cloudinary.uploader.upload(req.file.path);
-//             blogPicture = result.secure_url;
-//         }
+   try{
+        // Find the existing blog to get the current image URL if no new image is uploaded
+        const existingReport = await Report.findById(reportId);
 
-//         // Find the existing blog to get the current image URL if no new image is uploaded
-//         const existingBlog = await Blogs.findById(blogId);
-
-//         if (!existingBlog) {
-//             return res.json({ success: false, message: "Blog not found" });
-//         }
-
-//         // If no new image is uploaded, keep the current blog picture
-//         blogPicture = blogPicture || existingBlog.blogPicture;
-
-//         // Update the blog
-//         const blog = await Blogs.findByIdAndUpdate(blogId, {
-//             blogName,
-//             blogPicture,
-//             blogBody,
-//         }, { new: true });
-
-//         return res.status(200).json({ success: true, blog });
-//     } catch (error) {
-//         console.error("Error updating blog:", error);
-//         return res.status(500).json({ success: false, message: "An error occurred while updating the blog" });
-//     }
-// });
-
-// router.delete('/blogs/delete', async (req, res) => {
-//     const { blogId } = req.body
-//     try {
-//         const blog = await Blogs.findById(blogId);
-//         if (!blog) {
-//             return res.status(404).json({ success: false, message: "Blog not found" });
-//         }
-//         await Blogs.findByIdAndDelete(blogId)
-//         return res.status(200).json({ success: true, message: "Blog deleted successfully" });
-//     } catch (error) {
-//         return res.status(500).json({ success: false, message: "An error occurred while deleting the blog" });
-//     }
-// })
-
-// router.post('/blogs/comment', async (req, res) => {
-//     const { commenterId, comment, blogId } = req.body
-//     try {
-//         const user = await User.findById(commenterId)
-//         if (!user) {
-//             return res.json({ success: false, error: "No user found" })
-//         }
-//         const blog = await Blogs.findById(blogId)
-
-//         if (!blog) {
-//             return res.json({ success: false, error: "No blog found" })
-//         }
-//         const newComment = {
-//             commenterId,
-//             commenterName: user.name,
-//             commentText: comment,
-//         };
-//         blog.comments.push(newComment);
-
-//         // Save the updated blog document
-//         await blog.save();
-
-//         return res.status(200).json({ success: true, blog })
+        if (!existingReport) {
+            return res.status(400).json({ success: false, message: "Blog not found" });
+        }
 
 
-//     } catch (error) {
-//         return res.json({ success: false, error: error })
-//     }
-// })
 
-// router.put('/blogs/comment/update', async (req, res) => {
-//     const { newComment, userId, commentId, blogId } = req.body
-//     try {
-//         const blog = await Blogs.findById(blogId)
-//         if (!blog) {
-//             return res.json({ success: false, error: "No blog found" })
-//         }
-//         const comment = blog.comments.id(commentId);
-//         if (!comment) {
-//             return res.status(404).json({ success: false, error: "No comment found" });
-//         }
+        // Update the blog
+        const report = await Report.findByIdAndUpdate(reportId, {
+            reportTitle,reportPic ,reportVideo ,reportDescription,reportDivision,
+        reportDistrict,authorId ,crimeTime
+        }, { new: true });
 
-//         if (comment.commenterId.toString() !== userId) {
-//             return res.status(403).json({ success: false, error: "Commenter doesn't match" });
-//         }
+        return res.status(201).json({ success: true, report });
+    } catch (error) {
+        console.error("Error updating blog:", error);
+        return res.status(400).json({ success: false, message: "An error occurred while updating the blog" });
+    }
+});
 
-//         comment.commentText = newComment;
-//         await blog.save();
+router.delete('/reports/delete', async (req, res) => {
+    const { reportId } = req.body
+    try {
+        const report = await Report.findById(reportId);
+        if (!report) {
+            return res.status(400).json({ success: false, message: "Blog not found" });
+        }
+        await Report.findByIdAndDelete(report)
+        return res.status(200).json({ success: true, message: "Blog deleted successfully" });
+    } catch (error) {
+        return res.status(400).json({ success: false, message: "An error occurred while deleting the blog" });
+    }
+})
 
-//         return res.status(200).json({ success: true })
+router.post('/reports/comment', async (req, res) => {
+    const { commenterId, commentBody,commentPic, reportId } = req.body
+    try {
+        const user = await User.findById(commenterId)
+        if (!user) {
+            return res.status(400).json({ success: false, message: "No user found" })
+        }
+        const report = await Report.findById(reportId)
 
+        if (!report) {
+            return res.status(400).json({ success: false, message: "No blog found" })
+        }
+        const newComment = new Comment({
+            commenterId,
+            commentBody,
+            commentPic,
+            reportId
+        });
 
-//     } catch (error) {
-//         return res.json({ success: false, error: error })
-//     }
-// })
-// router.delete('/blogs/comment/delete', async (req, res) => {
-//     const { userId, commentId, blogId } = req.body
-//     try {
-
-//         const blog = await Blogs.findById(blogId)
-//         if (!blog) {
-//             return res.json({ success: false, error: "No blog found" })
-//         }
-//         const comment = blog.comments.id(commentId);
-//         if (!comment) {
-//             return res.status(404).json({ success: false, error: "No comment found" });
-//         }
-//         if (comment.commenterId.toString() !== userId) {
-//             return res.status(403).json({ success: false, error: "Commenter doesn't match" });
-//         }
-//         blog.comments.pull(commentId);
-//         await blog.save();
-//         return res.status(200).json({ success: true })
-
-//     } catch (error) {
-//         console.log(error)
-//         return res.json({ success: false, error: error })
-//     }
+        await newComment.save()
+        
 
 
-// })
-
-// router.post('/blog/impression/:data', async (req, res) => {
-//     try {
-//         const { data } = req.params;
-//         const { blogId, userId } = req.body;
-
-//         const blog = await Blogs.findById(blogId);
-//         if (!blog) {
-//             return res.json({ success: false, error: "No blog found" });
-//         }
-
-//         const userObjectId = new mongoose.Types.ObjectId(userId);
-
-//         if (data === 'like') {
-//             const isLiked = blog.likers.some(likerId => likerId.equals(userObjectId));
-
-//             if (isLiked) {
-//                 blog.likers.pull(userObjectId);
-//                 blog.likeCount--;
-//             } else {
-//                 blog.likers.push(userObjectId);
-//                 blog.likeCount++;
 
 
-//                 const isDisliked = blog.dislikers.some(dislikerId => dislikerId.equals(userObjectId));
-//                 if (isDisliked) {
-//                     blog.dislikers.pull(userObjectId);
-//                     blog.dislikeCount--;
-//                 }
-//             }
-//         } else if (data === 'dislike') {
-//             const isDisliked = blog.dislikers.some(dislikerId => dislikerId.equals(userObjectId));
+        return res.status(201).json({ success: true, message:"comment made successfully" })
 
-//             if (isDisliked) {
-//                 // Remove the userId from dislikers array
-//                 blog.dislikers.pull(userObjectId);
-//                 blog.dislikeCount--;
-//             } else {
-//                 // Add the userId to dislikers array
-//                 blog.dislikers.push(userObjectId);
-//                 blog.dislikeCount++;
 
-//                 // Remove the userId from likers array if it's there
-//                 const isLiked = blog.likers.some(likerId => likerId.equals(userObjectId));
-//                 if (isLiked) {
-//                     blog.likers.pull(userObjectId);
-//                     blog.likeCount--;
-//                 }
-//             }
-//         }
+    } catch (error) {
+        return res.status(400).json({ success: false, message: error.message })
+    }
+})
 
-//         // Save the updated blog
-//         await blog.save();
+router.get('/comment',async(req,res)=>{
+    try {
+        const {reportId}=req.query
 
-//         return res.json({
-//             success: true,
-//             message: `Blog ${data}d successfully`,
-//             blog: blog,
-//         });
-//     } catch (error) {
-//         return res.json({ success: false, error: error.message || error });
-//     }
+        if (!reportId) {
+            return res.status(400).json({ success: false, message: "reportId is required" });
+        }
+        const comments= await Comment.find({reportId})
+        return res.status(201).json({success:true, comments})
+    } catch (error) {
+        
+    }
+})
 
-// })
+router.put('/reports/comment/update', async (req, res) => {
+    const {commentId, commenterId, commentBody,commentPic, reportId} = req.body
+    try {
+        const report = await Report.findById(reportId)
+        if (!report) {
+            return res.status(400).json({ success: false, message: "No blog found" })
+        }
+        const comment = await Comment.findById(commentId);
+        if (!comment) {
+            return res.status(400).json({ success: false, message: "No comment found" });
+        }
 
+        if (comment.commenterId.toString() !== commenterId) {
+            return res.status(400).json({ success: false, message: "Unauthorized to update this comment" });
+        }
+
+        comment.commentBody = commentBody || comment.commentBody;
+        comment.commentPic = commentPic || comment.commentPic;
+
+        await comment.save();
+
+
+        return res.status(201).json({
+            success: true,
+            message: "Comment updated successfully",
+            });
+
+
+    } catch (error) {
+        return res.status(400).json({ success: false, message: error.message})
+    }
+})
+
+
+
+router.delete('/reports/comment/delete', async (req, res) => {
+    const { commenterId, commentId } = req.body
+    try {
+
+        const comment = await Comment.findById(commentId)
+        if (!comment) {
+            return res.status(400).json({ success: false, message: "No coment found" })
+        }
+       
+        if (comment.commenterId.toString() !== commenterId) {
+            return res.status(400).json({ success: false, message: "Commenter doesn't match" });
+        }
+        await Comment.findByIdAndDelete(commentId)
+        return res.status(200).json({ success: true })
+
+    } catch (error) {
+        console.log(error)
+        return res.status(400).json({ success: false, message: error.message })
+    }
+
+})
+
+
+router.post('/reports/impression/:data', async (req, res) => {
+    try {
+        const { data } = req.params;
+        const { reportId, userId } = req.body;
+
+        // Convert userId to ObjectId
+        const userObjectId = new mongoose.Types.ObjectId(userId);
+
+        // Find the report by ID
+        const report = await Report.findById(reportId);
+        if (!report) {
+            return res.status(404).json({ success: false, message: "No report found" });
+        }
+
+        if (data === 'like') {
+            const isLiked = report.likers.some(likerId => likerId.equals(userObjectId));
+
+            if (isLiked) {
+                // Remove like
+                report.likers.pull(userObjectId);
+                report.likeCount--;
+            } else {
+                // Add like
+                report.likers.push(userObjectId);
+                report.likeCount++;
+
+                // Remove from dislikers if already disliked
+                const isDisliked = report.dislikers.some(dislikerId => dislikerId.equals(userObjectId));
+                if (isDisliked) {
+                    report.dislikers.pull(userObjectId);
+                    report.dislikeCount--;
+                }
+            }
+        } else if (data === 'dislike') {
+            const isDisliked = report.dislikers.some(dislikerId => dislikerId.equals(userObjectId));
+
+            if (isDisliked) {
+                // Remove dislike
+                report.dislikers.pull(userObjectId);
+                report.dislikeCount--;
+            } else {
+                // Add dislike
+                report.dislikers.push(userObjectId);
+                report.dislikeCount++;
+
+                // Remove from likers if already liked
+                const isLiked = report.likers.some(likerId => likerId.equals(userObjectId));
+                if (isLiked) {
+                    report.likers.pull(userObjectId);
+                    report.likeCount--;
+                }
+            }
+        } else {
+            return res.status(400).json({ success: false, message: "Invalid action. Use 'like' or 'dislike'." });
+        }
+
+        // Save updated report
+        await report.save();
+
+        return res.status(201).json({
+            success: true,
+            message: `Report ${data}d successfully`,
+            report,
+        });
+    } catch (error) {
+        return res.status(400).json({ success: false, message: error.message });
+    }
+});
 
 
 module.exports = router
