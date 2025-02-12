@@ -8,6 +8,15 @@ export default function ReportIncident() {
   const [selectedDivision, setSelectedDivision] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
 
+  const [reportTitle, setReportTitle] = useState("");
+const [reportDescription, setReportDescription] = useState("");
+
+const [crimeTime, setCrimeTime] = useState("");
+const [authorId, setAuthorId] = useState(""); // Assuming you have the authorId available
+const [reportPic, setReportPic] = useState(null); // For storing the uploaded image
+const [reportVideo, setReportVideo] = useState(null); // For storing the uploaded video
+
+
   useEffect(() => {
     const fetchDivisions = async () => {
       try {
@@ -22,6 +31,47 @@ export default function ReportIncident() {
 
     fetchDivisions();
   }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    // Form data
+    const formData = new FormData();
+    formData.append("reportTitle", reportTitle);
+    formData.append("reportDescription", reportDescription);
+    formData.append("reportDivision", selectedDivision);
+    formData.append("reportDistrict", selectedDistrict);
+    formData.append("crimeTime", crimeTime);
+    formData.append("authorId", authorId);
+    
+    if (reportPic) formData.append("reportPic", reportPic);
+    if (reportVideo) formData.append("reportVideo", reportVideo);
+  
+    try {
+      const response = await axios.post("https://your-backend-url/reports/create", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // For file uploads
+        },
+      });
+  
+      if (response.data.success) {
+        alert("Report created successfully");
+        // Reset the form
+        setReportTitle("");
+        setReportDescription("");
+        setSelectedDivision("");
+        setSelectedDistrict("");
+        setCrimeTime("");
+        setReportPic(null);
+        setReportVideo(null);
+      } else {
+        alert("Error creating report");
+      }
+    } catch (error) {
+      console.error("Error submitting report:", error);
+      alert("An error occurred while submitting the report");
+    }
+  };
 
   const fetchDistricts = async (division) => {
     const disticts = await axios.get(
