@@ -61,7 +61,7 @@ function CrimeFeed() {
               blogName={blog.reportTitle}
               blogBody={blog.reportDescription}
               blogPicture={blog.reportPic}
-              // authorName={blog.authorName}
+              authorName={blog.authorId?.userName} 
               likes={blog.likeCount}
               disLikes={blog.dislikeCount}
             />

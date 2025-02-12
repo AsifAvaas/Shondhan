@@ -9,6 +9,7 @@ import CrimeFeed from "./pages/Feed";
 import Trending from "./pages/Trending";
 import Profile from "./pages/Profile";
 import Events from "./pages/Events";
+import FeedPage from "./pages/FeedPage";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/feed" element={<CrimeFeed />} />
+          <Route path="/feed/:id" element={<FeedPage />} />
           <Route path="/events" element={<Events />} />
           <Route path="/trending" element={<Trending />} />
           <Route path="/profile" element={<Profile />} />

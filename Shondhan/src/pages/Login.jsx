@@ -21,8 +21,9 @@ function Login() {
   const submit = async (e) => {
     e.preventDefault();
     try {
+      console.log(form)
       const response = await axios.post(
-        `${import.meta.env.VITE_Backend_Route}/auth/login`,
+        `http://localhost:8000/auth/login`,
         {
           email: form.email,
           password: form.password,
@@ -35,7 +36,7 @@ function Login() {
         localStorage.setItem("accessToken", response.data.accessToken);
         localStorage.setItem("refreshToken", response.data.refreshToken);
         localStorage.setItem("profilePic", response.data.profilePic);
-        navigate("/home"); // Redirect to home page on success
+        navigate("/"); // Redirect to home page on success
       }
     } catch (error) {
       // Handle error (status 400)
