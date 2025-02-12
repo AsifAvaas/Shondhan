@@ -1,7 +1,7 @@
 import React from "react";
-
 import { ArrowUp as Like, ArrowDown as Dislike, MessageCircle as Comment } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+
 function Blogs(props) {
   const navigate = useNavigate();
   const text = props.blogBody;
@@ -11,58 +11,57 @@ function Blogs(props) {
   const truncatedText = isTruncated
     ? words.slice(0, 50).join(" ") + "..."
     : text;
+
   const blogDetails = (id) => {
     navigate(`/blogs/${id}`);
   };
+
   return (
-    <div className="p-1 m-2 sm:p-3">
-      <div className="w-full border border-gray-500 rounded-lg sm:rounded-lg p-1 bg-slate-800">
+    <div className="max-w-3xl mx-auto p-4">
+      <div className="w-full bg-white shadow-lg border border-gray-300 rounded-md flex flex-col">
         {props.blogPicture && (
           <img
             src={props.blogPicture}
-            alt="Image 1"
-            className="w-full h-auto p-2 rounded-"
-          ></img>
+            alt="Blog"
+            className="w-full h-[200px] object-cover rounded-t-md"
+          />
         )}
-        <div className="p-2 ">
-          <h1 className="font-bold text-lg">{props.blogName}</h1>
-          <h3 className="text-gray-400 ">{props.authorName}</h3>
-          <p className="text-gray-200">{truncatedText}</p>
+        <div className="p-4 flex flex-col space-y-3">
+          <h1 className="font-semibold text-xl text-gray-800">{props.blogName}</h1>
+          <h3 className="text-gray-600 text-sm">{props.authorName}</h3>
+          <p className="text-gray-700 text-base">{truncatedText}</p>
+
           {isTruncated && (
             <span
-              onClick={() => {
-                blogDetails(props.blogId);
-              }}
-              className="text-blue-500 hover:underline cursor-pointer"
+              onClick={() => blogDetails(props.blogId)}
+              className="text-blue-500 hover:text-blue-600 hover:underline cursor-pointer"
             >
               Read More
             </span>
           )}
-          <div className="flex">
-            <span
-              onClick={() => {
-                blogDetails(props.blogId);
-              }}
-              className="flex border w-min p-2 my-3 rounded-3xl hover:cursor-pointer"
+
+          <div className="flex items-center justify-between text-sm text-gray-600 mt-4">
+            <div
+              onClick={() => blogDetails(props.blogId)}
+              className="flex items-center space-x-2 cursor-pointer"
             >
-              <div className="flex border-r-2">
-                <div className="ml-1">{props.likes}</div>
-                <Like />
+              <div className="flex items-center space-x-1">
+                <Like className="text-gray-500 hover:text-green-500" />
+                <span className="text-gray-500 hover:text-green-500">{props.likes}</span>
               </div>
-              <div className="flex">
-                <Dislike />
-                <div className="mr-1">{props.disLikes}</div>
+              <div className="flex items-center space-x-1">
+                <Dislike className="text-gray-500 hover:text-red-500" />
+                <span className="text-gray-500 hover:text-red-500">{props.disLikes}</span>
               </div>
-            </span>
-            <span
-              onClick={() => {
-                blogDetails(props.blogId);
-              }}
-              className="flex border w-min p-2 mx-5 my-3 rounded-3xl hover:cursor-pointer"
+            </div>
+
+            <div
+              onClick={() => blogDetails(props.blogId)}
+              className="flex items-center space-x-2 cursor-pointer"
             >
-              <Comment />
-              <div className="mr-2">Comments</div>
-            </span>
+              <Comment className="text-gray-500 hover:text-yellow-500" />
+              <span className="text-gray-500 hover:text-yellow-500">Comments</span>
+            </div>
           </div>
         </div>
       </div>

@@ -9,11 +9,12 @@ import CrimeFeed from "./pages/Feed";
 import Trending from "./pages/Trending";
 import Profile from "./pages/Profile";
 import Events from "./pages/Events";
+import AdminPanel from "./pages/AdminPanel";
 
 function App() {
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
+      <Navbar/>
       <div className="px-20">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -26,6 +27,9 @@ function App() {
           <Route path="/profile" element={<Profile />} />
         </Routes>
       </div>
+      <Routes>
+        <Route path="/admin/*" element={<AdminPanel />} />
+      </Routes>
       <Footer></Footer>
     </div>
   );
