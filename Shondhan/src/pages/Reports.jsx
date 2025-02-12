@@ -8,9 +8,19 @@ export default function ReportIncident() {
   const [selectedDivision, setSelectedDivision] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
 
-  useEffect(async () => {
-    const division = await axios.get("https://bdapis.com/api/v1.2/divisions");
-    setDivisions(division.data.data);
+  useEffect(() => {
+    const fetchDivisions = async () => {
+      try {
+        const response = await axios.get(
+          "https://bdapis.com/api/v1.2/divisions"
+        );
+        setDivisions(response.data.data);
+      } catch (error) {
+        console.error("Error fetching divisions:", error);
+      }
+    };
+
+    fetchDivisions();
   }, []);
 
   const fetchDistricts = async (division) => {

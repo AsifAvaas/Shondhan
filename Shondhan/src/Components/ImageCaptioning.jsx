@@ -13,6 +13,7 @@ const refineCaption = (caption) => {
 
 function ImageCaptioningComponent() {
   const [images, setImages] = useState([]);
+  const [watermarkedImages, setWatermarkedImages] = useState([]);
   const [captions, setCaptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -32,8 +33,55 @@ function ImageCaptioningComponent() {
     setCaptions(Array(validFiles.length).fill(""));
     setError(null);
     describeImages(validFiles);
+
+    const addWatermark = (img) => {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext("2d");
+
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      ctx.drawImage(img, 0, 0);
+
+      ctx.font = `${img.width / 20}px Arial`;
+      ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+      ctx.textAlign = "right";
+      ctx.fillText("© YourBrand", img.width - 20, img.height - 20);
+
+      setWatermarkedImages((prev) => [...prev, canvas.toDataURL("image/png")]);
+    };
+    addWatermark();
+    submitImage(images)
   };
 
+
+  async function submitImage(images) {
+    const imageBase64Array = [];
+  
+    for (let image of images) {
+      const base64 = await toBase64(image);
+      imageBase64Array.push(base64);
+    }
+  
+    const response = await fetch("http://localhost:8000/api/upload-multiple", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ images: imageBase64Array }),
+    });
+  
+    const data = await response.json();
+    console.log("Uploaded Images:", data.urls);
+  }
+  
+  // ✅ Convert Image to Base64
+  function toBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  }
   const describeImages = async (imageFiles) => {
     setLoading(true);
     setError(null);
@@ -49,7 +97,9 @@ function ImageCaptioningComponent() {
             {
               method: "POST",
               headers: {
-                Authorization: `Bearer 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`,
+                Authorization: `Bearer ${
+                  import.meta.env.VITE_HUGGINGFACE_API_KEY
+                }`,
               },
               body: file,
             }
