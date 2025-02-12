@@ -30,13 +30,10 @@ function CrimeFeed() {
     //         withCredentials: true,
     //       }
     //     );
-
     //     if (response.data.success) {
     //       const newBlogs = response.data.blogs;
-
     //       // Update the total number of blogs
     //       setTotalBlogs(response.data.totalBlogs);
-
     //       // Filter out duplicate blogs and update allBlogs
     //       setAllBlogs((prevBlogs) => {
     //         const blogIds = prevBlogs.map((blog) => blog._id);
@@ -44,10 +41,8 @@ function CrimeFeed() {
     //           (blog) => !blogIds.includes(blog._id)
     //         );
     //         const updatedBlogs = [...prevBlogs, ...filteredBlogs];
-
     //         // Check if there are more blogs to fetch after updating allBlogs
     //         setHasMore(updatedBlogs.length < response.data.totalBlogs);
-
     //         return updatedBlogs;
     //       });
     //       if (page === 1) {
@@ -63,7 +58,6 @@ function CrimeFeed() {
     //     setPageLoading(false);
     //   }
     // };
-
     // // Stop fetching when there are no more blogs
     // useEffect(() => {
     //   if (hasMore) {
@@ -83,7 +77,6 @@ function CrimeFeed() {
     //   },
     //   [loading, hasMore]
     // );
-
     // const filteredBlogs = useMemo(() => {
     //   return allBlogs.filter((blogs) => {
     //     const lowerCaseQuery = query.toLowerCase();
@@ -94,22 +87,23 @@ function CrimeFeed() {
     //     );
     //   });
     // });
+  };
 
-    return (
-      <>
-        <div className="flex justify-center">
-          <div className="container w-full max-w-5xl">
-            <div className="p-1 m-2 sm:p-3">
-              <div
-                onClick={() => navigate("/blogs/new")}
-                className="w-full p-3 h-20 bg-slate-700 rounded-xl text-gray-400 hover:cursor-pointer"
-                placeholder="Add a new Blog"
-                name="newBlog"
-              >
-                Add a new Blog...
-              </div>
+  return (
+    <>
+      <div className="flex justify-center">
+        <div className="container w-full max-w-5xl">
+          <div className="p-1 m-2 sm:p-3">
+            <div
+              onClick={() => navigate("/blogs/new")}
+              className="w-full p-3 h-20 bg-slate-700 rounded-xl text-gray-400 hover:cursor-pointer"
+              placeholder="Add a new Blog"
+              name="newBlog"
+            >
+              Add a new Blog...
             </div>
-            {/* {filteredBlogs.length > 0 ? (
+          </div>
+          {/* {filteredBlogs.length > 0 ? (
               filteredBlogs.map((blogs, index) => {
                 if (filteredBlogs.length === index + 1) {
                   return (
@@ -143,28 +137,27 @@ function CrimeFeed() {
             ) : (
               <div>No blogs are present</div>
             )} */}
-            <Blogs
-              blogId={100349}
-              blogName={"Testing Blog"}
-              blogBody={"jdfhsjgfhjdgsahgjkfjdhgh"}
-              blogPicture={
-                "https://th.bing.com/th/id/OIP.MhZKX1fQqVXzGUuMU6JnowHaEK?rs=1&pid=ImgDetMain"
-              }
-              authorName={"asif"}
-              likes={20}
-              disLikes={5}
-            />
+          <Blogs
+            blogId={100349}
+            blogName={"Testing Blog"}
+            blogBody={"jdfhsjgfhjdgsahgjkfjdhgh"}
+            blogPicture={
+              "https://th.bing.com/th/id/OIP.MhZKX1fQqVXzGUuMU6JnowHaEK?rs=1&pid=ImgDetMain"
+            }
+            authorName={"asif"}
+            likes={20}
+            disLikes={5}
+          />
 
-            {loading && (
-              <div className="flex justify-center">
-                <span className="loading loading-dots loading-lg"></span>
-              </div>
-            )}
-          </div>
+          {loading && (
+            <div className="flex justify-center">
+              <span className="loading loading-dots loading-lg"></span>
+            </div>
+          )}
         </div>
-      </>
-    );
-  };
+      </div>
+    </>
+  );
 }
 
 export default CrimeFeed;
