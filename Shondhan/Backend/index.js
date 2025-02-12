@@ -11,12 +11,16 @@ const frontend = process.env.FrontEnd
 MongDB()
 
 
+const UserRouter= require('./Routes/UserRoute')
+const ReportRouter= require('./Routes/ReportRoute')
+
+
 const allowedOrigins = [
     frontend,
     'https://talk-threads-seven.vercel.app'
 ];
 
-
+app.use(express.json())
 
 app.use(cors({
     origin: function (origin, callback) {
@@ -32,6 +36,21 @@ app.use(cors({
     credentials: true
 }))
 app.use(cookieParser())
+
+
+
+
+
+app.use('/auth',UserRouter)
+app.use('/api',ReportRouter)
+
+
+
+
+
+
+
+
 
 
 app.get('/', (req, res) => {
