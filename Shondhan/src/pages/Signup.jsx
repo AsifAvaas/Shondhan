@@ -1,15 +1,57 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
+import axios from "axios";
 
 function Signup() {
+  const navigate=useNavigate()
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
+    const [msg, setMsg] = useState("");
+    const [err, setErr] = useState("");
+
+  const submit = async (e) => {
+    e.preventDefault();
+    try {
+      // console.log(form)
+      if(form.password !==form.confirmPassword){
+        alert("password dont match")
+      }
+      const response = await axios.post(
+        "http://localhost:8000/auth/signup",
+        {
+          userName:form.name,
+          email: form.email,
+          password: form.password,
+        }
+      );
+      console.log(response.data)
+      // Handle success (status 201)
+      if (response.status === 201 || response.data.success) {
+       
+        navigate("/login"); // Redirect to home page on success
+      }
+    } catch (error) {
+      // Handle error (status 400)
+      console.log(error)
+      if (error.response && error.response.status === 400) {
+        setErr("Login failed. Please check your credentials.");
+        setMsg("");
+      } else {
+        setErr("An unexpected error occurred. Please try again.");
+        setMsg("");
+      }
+    }
+  };
+
+
+
+
 
   const onchange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -30,7 +72,7 @@ function Signup() {
               </p>
             </div>
 
-            <form className="mt-6 space-y-6">
+            <form onSubmit={submit} className="mt-6 space-y-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                   Name

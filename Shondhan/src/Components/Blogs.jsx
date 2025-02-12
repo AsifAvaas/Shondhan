@@ -12,7 +12,7 @@ function Blogs(props) {
     ? words.slice(0, 50).join(" ") + "..."
     : text;
   const blogDetails = (id) => {
-    navigate(`/blogs/${id}`);
+    navigate(`/feed/${id}`);
   };
   return (
     <div className="p-1 m-2 sm:p-3">
