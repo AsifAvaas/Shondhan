@@ -20,7 +20,7 @@ router.post('/test',async(req,res)=>{
 
 router.post('/signup', body('userName', 'Name must be 6 charecter Long').isLength({ min: 6 }),
     body('email', 'Invalid Email').isEmail(),
-    body('password', 'Password must contain minimum of 8 letters, including both uppuercase and lowercase').isStrongPassword({
+    body('password', 'Password must contain a minimum of 8 characters, including 1 uppercase, 1 lowercase, 1 number, and 1 special symbol.').isStrongPassword({
         minLength: 8,
 
     }), async (req, res) => {

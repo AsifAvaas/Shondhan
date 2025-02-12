@@ -13,6 +13,9 @@ MongDB()
 
 const UserRouter= require('./Routes/UserRoute')
 const ReportRouter= require('./Routes/ReportRoute')
+const EventRouter= require('./Routes/EventRoute')
+const serviceRouter= require('./Routes/ServiceRoute')
+const ProfileRouter= require('./Routes/ProfileRoute')
 
 
 const allowedOrigins = [
@@ -43,6 +46,10 @@ app.use(cookieParser())
 
 app.use('/auth',UserRouter)
 app.use('/api',ReportRouter)
+app.use('/api',EventRouter)
+app.use('/api',serviceRouter)
+app.use('/api',ProfileRouter)
+
 
 
 
