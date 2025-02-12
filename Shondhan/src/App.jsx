@@ -12,8 +12,9 @@ import Events from "./pages/Events";
 
 function App() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col space-y-5">
       <Navbar />
+      <div className = 'px-23'>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -24,6 +25,7 @@ function App() {
         <Route path="/trending" element={<Trending />} />
         <Route path="/profile" element={<Profile />} />
       </Routes>
+      </div>
       <Footer></Footer>
     </div>
   );
