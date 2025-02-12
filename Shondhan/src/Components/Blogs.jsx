@@ -1,6 +1,6 @@
 import React from "react";
 
-import { ThumbsUp as Like, ThumbsDown as Dislike, MessageCircle as Comment } from "lucide-react";
+import { ArrowUp as Like, ArrowDown as Dislike, MessageCircle as Comment } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 function Blogs(props) {
   const navigate = useNavigate();
