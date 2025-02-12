@@ -25,19 +25,12 @@ const allowedOrigins = [
 
 app.use(express.json())
 
+
 app.use(cors({
-    origin: function (origin, callback) {
-        if (allowedOrigins.includes(origin) || !origin) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ['Content-Type', 'accessToken', 'refreshToken'],
-    credentials: true
-}))
+  origin: 'http://localhost:5173', // your frontend's URL
+  credentials: true,
+}));
+
 app.use(cookieParser())
 
 
