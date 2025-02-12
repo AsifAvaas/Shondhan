@@ -45,7 +45,7 @@ function CrimeFeed() {
         <div className="p-1 m-2 sm:p-3">
           <div
             onClick={() => navigate("/blogs/new")}
-            className="w-full p-3 h-20 bg-slate-700 rounded-xl text-gray-400 hover:cursor-pointer"
+            className="w-full p-3 h-20 border border-gray-500 bg-gray-100 rounded-xl text-gray-400 hover:cursor-pointer"
             placeholder="Add a new Blog"
             name="newBlog"
           >

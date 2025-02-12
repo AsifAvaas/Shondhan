@@ -33,20 +33,20 @@ const Home = () => {
 
           <button 
             className="text-center p-6 bg-[#000022] text-[#FBF5F3] rounded-lg shadow-lg hover:shadow-2xl transition transform hover:scale-105"
-            onClick={() => navigate('/organize')}
+            onClick={() => navigate('/feed')}
           >
             <div className="flex justify-center mb-4">
               <Crown size={60} />
             </div>
-            <h3 className="text-2xl font-bold mb-2">Organize</h3>
+            <h3 className="text-2xl font-bold mb-2">Crime Feed</h3>
             <p className="p-4">
-              Join us in organizing events and initiatives to prevent crime and promote community safety.
+              Take a look at our crime feed providing personalized information from users only.
             </p>
           </button>
 
           <button 
             className="text-center p-6 bg-white rounded-lg shadow-lg hover:shadow-2xl transition transform hover:scale-105"
-            onClick={() => navigate('/help')}
+            onClick={() => navigate('/emergency-contacts')}
           >
             <div className="flex justify-center mb-4">
               <Phone size={60} className="text-[#311B08]" />

@@ -10,6 +10,7 @@ import Trending from "./pages/Trending";
 import Profile from "./pages/Profile";
 import Events from "./pages/Events";
 import FeedPage from "./pages/FeedPage";
+import EmergencyContacts from "./pages/EmergencyContacts";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/events" element={<Events />} />
           <Route path="/trending" element={<Trending />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/emergency-contacts" element={<EmergencyContacts />} />
         </Routes>
       </div>
       <Footer></Footer>
